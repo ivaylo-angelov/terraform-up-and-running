@@ -1,5 +1,18 @@
 provider "aws" {
-  region = "us-west-2"
+  region = "eu-west-1"
+}
+
+terraform {
+  backend "s3" {
+    # Replace this with your bucket name!
+    bucket = "terraform-up-and-running-state-nuk"
+    key    = "stage/services/webserver-cluster/terraform.tfstate"
+    region = "eu-west-1"
+
+    # Replace this with your DynamoDB table name!
+    dynamodb_table = "terraform-up-and-running-locks"
+    encrypt        = true
+  }
 }
 
 data "aws_vpc" "default" {
@@ -11,7 +24,7 @@ data "aws_subnet_ids" "default" {
 }
 
 resource "aws_launch_configuration" "example" {
-  image_id        = "ami-090717c950a5c34d3"
+  image_id        = "ami-0943382e114f188e8"
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.instance.id]
 
@@ -36,7 +49,7 @@ resource "aws_autoscaling_group" "example" {
 
   min_size         = 2
   max_size         = 10
-  desired_capacity = 4
+  desired_capacity = 2
 
   tag {
     key                 = "Name"
@@ -131,15 +144,4 @@ resource "aws_security_group" "instance" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-variable "server_port" {
-  description = "The port the server will use for HTTP requests"
-  type        = number
-  default     = 8080
-}
-
-output "alb_dns_name" {
-  value       = aws_lb.example.dns_name
-  description = "The domain name of the load balancer"
 }
