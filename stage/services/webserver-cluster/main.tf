@@ -18,6 +18,9 @@ terraform {
 module "webserver_cluster" {
   source = "../../../modules/services/webserver-cluster"
 
+  ami         = "ami-0943382e114f188e8"
+  server_text = "New server text v3"
+
   cluster_name           = "webservers-stage"
   db_remote_state_bucket = "terraform-up-and-running-state-nuk"
   db_remote_state_key    = "stage/data-stores/mysql/terraform.tfstate"
